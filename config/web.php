@@ -14,7 +14,7 @@ $config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => '',
+            'cookieValidationKey' => '123',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -53,6 +53,11 @@ $config = [
         */
     ],
     'params' => $params,
+    'modules' => [
+        'avalon' => [
+            'class' => 'app\modules\avalon\Module',
+        ],
+    ],
 ];
 
 if (YII_ENV_DEV) {
