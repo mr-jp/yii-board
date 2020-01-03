@@ -57,6 +57,9 @@ $config = [
         'avalon' => [
             'class' => 'app\modules\avalon\Module',
         ],
+        'hitler' => [
+            'class' => 'app\modules\hitler\Module',
+        ],
     ],
 ];
 
