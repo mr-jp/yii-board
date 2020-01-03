@@ -63,7 +63,7 @@ class SiteController extends Controller
     {
         // redirect to avalon module
         // @todo check URL and redirect accordingly
-        $this->redirect(['/avalon/default/index']);
+        $this->redirect(['/avalon/site/index']);
     }
 
     /**

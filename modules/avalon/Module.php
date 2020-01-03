@@ -7,6 +7,8 @@ namespace app\modules\avalon;
  */
 class Module extends \yii\base\Module
 {
+    private $_assetsUrl;
+
     /**
      * {@inheritdoc}
      */
@@ -20,5 +22,12 @@ class Module extends \yii\base\Module
         parent::init();
 
         // custom initialization code goes here
+    }
+
+    public function getAssetsUrl()
+    {
+        if ($this->_assetsUrl === null)
+            $this->_assetsUrl = Yii::$app()->getAssetManager()->publish(__DIR__ . '/assets', false, -1, true);
+        return $this->_assetsUrl;
     }
 }
