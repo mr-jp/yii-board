@@ -61,9 +61,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // redirect to avalon module
-        // @todo redirect based on URL
-        $this->redirect(['/avalon/default/index']);
+        return $this->render('index');
     }
 
     /**
