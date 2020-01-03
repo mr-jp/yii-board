@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\avalon\models;
+namespace app\models;
 
 class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
 {
@@ -14,7 +14,7 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         '100' => [
             'id' => '100',
             'username' => 'admin',
-            'password' => 'avalon123',
+            'password' => 'admin123',
             'authKey' => 'test100key',
             'accessToken' => '100-token',
         ],

@@ -1,0 +1,37 @@
+init:
+git clone https://github.com/yiisoft/yii2-app-basic.git yii-board
+cd yii-board
+composer install
+\.init.bat
+
+database configuration:
+config/db.php
+
+generate module
+
+make sure assets directory is writable
+
+hitler
+    `redirect
+    `db
+        `player
+        `game
+    `model
+        `player
+        `game
+    admin
+        `controller
+        index
+            `list
+                view
+            create
+                start game
+                    assignRole
+                        `assign hitler
+                        `assign fascists
+                        `assign liberals
+                view role
+    player
+        controller
+        index / join
+        role

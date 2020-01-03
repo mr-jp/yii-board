@@ -10,6 +10,8 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
+$title = 'Hitler Role Generator';
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -20,7 +22,7 @@ AppAsset::register($this);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+    <title>$title</title>
     <?php $this->head() ?>
 </head>
 <body>
@@ -29,8 +31,8 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => $this->title,
-        'brandUrl' => Yii::$app->user->isGuest ? Yii::$app->homeUrl : Yii::$app->urlManager->createUrl("/avalon/admin/index"),
+        'brandLabel' => $title,
+        'brandUrl' => Yii::$app->user->isGuest ? Yii::$app->homeUrl : Yii::$app->urlManager->createUrl("/hitler/admin/index"),
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
@@ -40,15 +42,15 @@ AppAsset::register($this);
         'items' => [
 
             Yii::$app->user->isGuest ? (
-                ['label' => 'New Game', 'url' => ['/avalon/site/index']]
+                ['label' => 'New Game', 'url' => ['/hitler/site/index']]
             ) : (
-                ['label' => 'Admin', 'url' => ['/avalon/admin/index']]
+                ['label' => 'Admin', 'url' => ['/hitler/admin/index']]
             ),
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/avalon/site/login']]
+                ['label' => 'Login', 'url' => ['/hitler/site/login']]
             ) : (
                 '<li>'
-                . Html::beginForm(['/avalon/site/logout'], 'post')
+                . Html::beginForm(['/hitler/site/logout'], 'post')
                 . Html::submitButton(
                     'Logout (' . Yii::$app->user->identity->username . ')',
                     ['class' => 'btn btn-link logout']

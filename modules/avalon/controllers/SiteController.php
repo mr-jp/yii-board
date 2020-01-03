@@ -11,7 +11,7 @@ use yii\web\Controller;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\modules\avalon\models\LoginForm;
+use app\models\LoginForm;
 use app\modules\avalon\models\ContactForm;
 use app\modules\avalon\helpers\RoleHelper;
 

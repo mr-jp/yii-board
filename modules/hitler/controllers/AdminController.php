@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\avalon\controllers;
+namespace app\modules\hitler\controllers;
 
 use Yii;
-use app\modules\avalon\models\Game;
-use app\modules\avalon\models\Player;
+use app\modules\hitler\models\HitlerGame;
+use app\modules\hitler\models\HitlerPlayer;
 use yii\data\ActiveDataProvider;
 use yii\data\Sort;
 use yii\filters\AccessControl;
@@ -13,9 +13,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use app\models\LoginForm;
-use app\modules\avalon\models\ContactForm;
-use app\modules\avalon\helpers\RoleHelper;
+// use app\modules\hitler\helpers\RoleHelper;
 
 class AdminController extends Controller
 {
@@ -66,7 +64,7 @@ class AdminController extends Controller
      */
     public function beforeAction($action)
     {
-        $this->layout = '@app/modules/avalon/views/layouts/main.php';
+        $this->layout = '@app/modules/hitler/views/layouts/main.php';
         return parent::beforeAction($action);
     }
 
@@ -81,17 +79,17 @@ class AdminController extends Controller
             return $this->goHome();
         }
 
-        $model = new Game();
+        $model = new HitlerGame();
 
         $dataProvider = new ActiveDataProvider([
-            'query' => Game::find(),
+            'query' => HitlerGame::find(),
             'sort'=> ['defaultOrder' => ['timestamp'=>SORT_DESC]]
         ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
             // Create player to join this game
-            $model2 = new Player();
+            $model2 = new HitlerPlayer();
             $model2->name = 'Jason';
             $model2->fk_game_id = $model->id;
             if($model2->save() == false) {
@@ -100,7 +98,7 @@ class AdminController extends Controller
             }
 
             // Set older open games to closed
-            Game::updateAll(['started'=>'1'], "id != {$model->id}");
+            HitlerGame::updateAll(['started'=>'1'], "id != {$model->id}");
 
             return $this->redirect(['wait', 'id' => $model->id, 'playerId' => $model2->id]);
         }
@@ -112,20 +110,13 @@ class AdminController extends Controller
     }
 
     /**
-     * Displays a single Game model.
+     * Displays a single HitlerGame model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
-    {
-        $model = $this->findModel($id);
-        $players = Player::find()->where(['fk_game_id'=>$id])->all();
-        return $this->render('view', [
-            'model' => $model,
-            'players' => $players,
-        ]);
-    }
+    {}
 
     /**
      * Waiting page
@@ -145,7 +136,7 @@ class AdminController extends Controller
 
         }
 
-        return $this->render('@app/modules/avalon/views/common/wait.php', [
+        return $this->render('@app/modules/hitler/views/common/wait.php', [
             'model' => $model,
             'gameModel' => $model
         ]);
@@ -158,45 +149,28 @@ class AdminController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionRole($id, $playerId)
-    {
-        $gameModel = $this->findModel($id);
-        $playerModel = $this->findPlayerModel($playerId);
-        extract(RoleHelper::findRoles($gameModel));
-
-        return $this->render('@app/modules/avalon/views/common/role.php', [
-            'gameModel' => $gameModel,
-            'playerModel' => $playerModel,
-            'minions' => $minions,
-            'servants' => $servants,
-            'merlin' => $merlin,
-            'morgana' => $morgana,
-        ]);
-    }
+    {}
 
     /**
-     * Deletes an existing Game model.
+     * Deletes an existing HitlerGame model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-        Player::deleteFromGame($id);
-        return $this->redirect(['index']);
-    }
+    {}
 
     /**
-     * Finds the Game model based on its primary key value.
+     * Finds the HitlerGame model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Game the loaded model
+     * @return HitlerGame the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Game::findOne($id)) !== null) {
+        if (($model = HitlerGame::findOne($id)) !== null) {
             return $model;
         }
 
@@ -211,11 +185,5 @@ class AdminController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findPlayerModel($id)
-    {
-        if (($model = Player::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
+    {}
 }
