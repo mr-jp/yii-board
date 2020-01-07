@@ -2,6 +2,7 @@
 
 namespace app\modules\hitler\models;
 
+use app\helpers\MyHelper;
 use Yii;
 
 /**
@@ -44,16 +45,16 @@ class HitlerPlayer extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Your Name',
             'team' => 'Team',
             'role' => 'Role',
-            'fk_game_id' => 'Fk Game ID',
+            'fk_game_id' => 'Game ID',
         ];
     }
 
     public function checkDuplicateName($attribute, $params)
     {
-        $count = HitlerPlayer::find()->where(['name'=>$this->name])->count();
+        $count = HitlerPlayer::find()->where(['name'=>$this->name, 'fk_game_id'=>$this->fk_game_id])->count();
         if ($count > 0) {
             $this->addError('name', "{$this->name} is already in the game!");
         }
@@ -66,5 +67,16 @@ class HitlerPlayer extends \yii\db\ActiveRecord
     public static function deleteFromGame($gameId)
     {
         HitlerPlayer::deleteAll('fk_game_id = :gameId', ['gameId'=>$gameId]);
+    }
+
+    /**
+     * Get the fascists
+     * @param HitlerGame $gameModel
+     * @return array
+     */
+    public function getFascists($gameModel)
+    {
+        $sql = 'SELECT * FROM `hitler_player` WHERE `fk_game_id` = :gameId AND `id` != :playerId AND `team` = "fascists" AND `role` != "hitler"';
+        return HitlerPlayer::findBySql($sql, [':gameId'=>$gameModel->id, ':playerId'=>$this->id])->all();
     }
 }

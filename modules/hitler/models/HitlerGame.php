@@ -56,7 +56,7 @@ class HitlerGame extends \yii\db\ActiveRecord
             'id' => 'ID',
             'timestamp' => 'Timestamp',
             'started' => 'Started',
-            'players' => 'Players',
+            'players' => 'Number of Players',
         ];
     }
 
@@ -102,6 +102,18 @@ class HitlerGame extends \yii\db\ActiveRecord
     }
 
     /**
+     * Cancel the game
+     */
+    public function cancelGame()
+    {
+        // Delete all players in this game
+        HitlerPlayer::deleteFromGame($this->id);
+
+        // Delete the current game
+        HitlerGame::delete(['id'=>$this->id]);
+    }
+
+    /**
      * Assign roles and save to database
      */
     private function assignRoles()
@@ -117,5 +129,14 @@ class HitlerGame extends \yii\db\ActiveRecord
                 throw new NotFoundHttpException('Cannot save player roles ...');
             }
         }
+    }
+
+    /**
+     * Get remaining players
+     * @return string
+     */
+    public function getRemainingPlayers()
+    {
+        return $this->players - HitlerPlayer::find()->where(['fk_game_id'=>$this->id])->count();
     }
 }
