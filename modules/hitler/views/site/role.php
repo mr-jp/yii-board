@@ -33,7 +33,7 @@ $this->title = 'Hitler Role Generator';
                 
                 <?php else: ?>
                     <h2 class="text-danger">You are a Fascist!</h2>
-                    
+                    <p><?= Html::img($imageBaseUrl.'/'.$playerModel->team.'.jpg', ['class'=>'role-img']) ?></p>
                     <button class="btn btn-danger" data-toggle="collapse" data-target="#role">Click to hide player notes ...</button>             
 
                     <div id="role" class="collapse in">
