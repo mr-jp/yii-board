@@ -18,7 +18,10 @@ $this->title = 'Hitler Role Generator';
                     <p>No open games ...</p>
                 <?php else:?>
                     <?php $joinForm = ActiveForm::begin(); ?>
-                        <?= $joinForm->field($playerModel, 'name')->textInput(['tabindex'=>'1']); ?>
+                        <?= $joinForm->field($playerModel, 'name')->textInput([
+                            'tabindex'=>'1',
+                            'autofocus'=>'1'
+                            ]); ?>
                         <?= $joinForm->field($playerModel, 'fk_game_id')->dropDownList(ArrayHelper::map($games, 'id', 'id')) ?>
 
                     <div class="form-group">

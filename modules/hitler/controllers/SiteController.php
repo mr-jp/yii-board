@@ -149,7 +149,9 @@ class SiteController extends Controller
         // Start Game
         if (Yii::$app->request->post('startGame') !== null) {
             if ($gameModel->startGame()) {
-                return $this->redirect(['role', 'gameId' => $gameModel->id, 'playerId' => $playerModel->id]);
+                Yii::$app->session['gameId'] = $gameModel->id;
+                Yii::$app->session['playerId'] = $playerModel->id;
+                return $this->redirect(['role']);
             } else {
                 // display errors here
                 Yii::$app->session->setFlash('error', 'Not all players have joined yet!');
@@ -159,7 +161,9 @@ class SiteController extends Controller
         // Join Game
         if (Yii::$app->request->post('joinGame') !== null) {
             if ($gameModel->started == '1') {
-                return $this->redirect(['role', 'gameId' => $gameModel->id, 'playerId' => $playerModel->id]);
+                Yii::$app->session['gameId'] = $gameModel->id;
+                Yii::$app->session['playerId'] = $playerModel->id;
+                return $this->redirect(['role']);
             } else {
                 Yii::$app->session->setFlash('error', 'Game is not ready yet!');
             }
@@ -182,13 +186,13 @@ class SiteController extends Controller
 
     /**
      * Role page
-     * @param integer $gameId
-     * @param integer $playerId
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionRole($gameId, $playerId)
+    public function actionRole()
     {
+        $gameId = Yii::$app->session['gameId'];
+        $playerId = Yii::$app->session['playerId'];
         $gameModel = $this->findGameModel($gameId);
         if ($gameModel == null) {
             // game no longer exists
