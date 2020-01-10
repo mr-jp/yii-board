@@ -40,7 +40,11 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/hitler/site/index']]
+            Yii::$app->session['gameStarted'] ? (
+                ['label' => 'New Game', 'url' => ['/hitler/site/quit']]
+            ) : (
+                ['label' => 'Home', 'url' => ['/hitler/site/index']]
+            )
         ]
     ]);
     // echo Nav::widget([

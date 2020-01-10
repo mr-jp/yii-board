@@ -39,6 +39,7 @@ $this->title = 'Hitler Role Generator';
                                 <p>Please tell the game creator to start the game ...</p>
                             <?php endif ?>
                             <?= Html::submitButton('Join Game', ['name'=>'joinGame', 'class' => 'btn btn-success']) ?>
+                            <?= Html::submitButton('Quit Game', ['name'=>'quitGame', 'class' => 'btn btn-danger']) ?>
                         <?php endif ?>
 
                     </div>

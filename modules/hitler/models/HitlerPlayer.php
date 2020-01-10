@@ -79,4 +79,12 @@ class HitlerPlayer extends \yii\db\ActiveRecord
         $sql = 'SELECT * FROM `hitler_player` WHERE `fk_game_id` = :gameId AND `id` != :playerId AND `team` = "fascists" AND `role` != "hitler"';
         return HitlerPlayer::findBySql($sql, [':gameId'=>$gameModel->id, ':playerId'=>$this->id])->all();
     }
+
+    /**
+     * Delete this player
+     */
+    public function quitGame()
+    {
+        HitlerPlayer::deleteAll('id = :playerId', ['playerId'=>$this->id]);
+    }
 }

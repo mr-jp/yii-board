@@ -76,6 +76,9 @@ class SiteController extends Controller
      */
     public function actionIndex() 
     {
+        // $this->clearSession();
+        $this->checkSession();
+        
         $gameModel = new HitlerGame();
         $playerModel = new HitlerPlayer();
         $games = HitlerGame::find()->where(['started'=>'0'])->orderBy(['timestamp'=>SORT_DESC])->all();
@@ -94,22 +97,26 @@ class SiteController extends Controller
 
                 if ($playerModel->save()) {
                     // save session for game creator
-                    Yii::$app->session['gameCreator'] = $gameModel->id;
+                    Yii::$app->session['gameCreator'] = true;
+                    Yii::$app->session['gameId'] = $gameModel->id;
+                    Yii::$app->session['playerId'] = $playerModel->id;
 
                     // redirect to wait page
-                    return $this->redirect(['wait', 'gameId' => $gameModel->id, 'playerId' => $playerModel->id]);
+                    return $this->redirect(['wait',]);
                 }
             }
-        } else {
-            // Clear game creator session
-            Yii::$app->session['gameCreator'] = '';
         }
 
         // join game
         if ($playerModel->load(Yii::$app->request->post())) {
             $playerModel->setScenario('create');
             if ($playerModel->save()) {
-                return $this->redirect(['wait', 'gameId' => $playerModel->fk_game_id, 'playerId' => $playerModel->id]);
+                // save session for game joiner
+                    Yii::$app->session['gameCreator'] = false;
+                    Yii::$app->session['gameId'] = $playerModel->fk_game_id;
+                    Yii::$app->session['playerId'] = $playerModel->id;
+
+                return $this->redirect(['wait']);
             }
         }
 
@@ -124,33 +131,36 @@ class SiteController extends Controller
 
     /**
      * Waiting page
-     * @param integer $gameId
-     * @param integer $playerId
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionWait($gameId, $playerId)
+    public function actionWait()
     {
+        $gameId = Yii::$app->session['gameId'];
+        $playerId = Yii::$app->session['playerId'];
+        $gameCreator = Yii::$app->session['gameCreator'];
+
         $gameModel = $this->findGameModel($gameId);
         if ($gameModel == null) {
             // game no longer exists
             Yii::$app->session->setFlash('error', 'Game no longer exists!');
-            return $this->redirect(['index', ['gameId'=>$gameId]]);
+            return $this->redirect(['index']);
         }
         $playerModel = $this->findplayerModel($playerId);
         if ($playerModel == null) {
             // game no longer exists
             Yii::$app->session->setFlash('error', 'Game no longer exists!');
-            $this->redirect(['index', ['playerId'=>$playerId]]);
+            $this->redirect(['index']);
         }
+
         $remainingPlayers = $gameModel->getRemainingPlayers();
-        $gameCreator = Yii::$app->session['gameCreator'];
 
         // Start Game
         if (Yii::$app->request->post('startGame') !== null) {
             if ($gameModel->startGame()) {
                 Yii::$app->session['gameId'] = $gameModel->id;
                 Yii::$app->session['playerId'] = $playerModel->id;
+                Yii::$app->session['gameStarted'] = true;
                 return $this->redirect(['role']);
             } else {
                 // display errors here
@@ -163,6 +173,7 @@ class SiteController extends Controller
             if ($gameModel->started == '1') {
                 Yii::$app->session['gameId'] = $gameModel->id;
                 Yii::$app->session['playerId'] = $playerModel->id;
+                Yii::$app->session['gameStarted'] = true;
                 return $this->redirect(['role']);
             } else {
                 Yii::$app->session->setFlash('error', 'Game is not ready yet!');
@@ -172,7 +183,16 @@ class SiteController extends Controller
         // Delete Game
         if (Yii::$app->request->post('cancelGame') !== null) {
             $gameModel->cancelGame();
+            $this->clearSession();
             Yii::$app->session->setFlash('info', 'Game cancelled ...');
+            return $this->redirect(['index']);
+        }
+
+        // Exit game
+        if (Yii::$app->request->post('quitGame') !== null) {
+            $playerModel->quitGame();
+            $this->clearSession();
+            Yii::$app->session->setFlash('info', 'Quit game ...');
             return $this->redirect(['index']);
         }
 
@@ -193,17 +213,18 @@ class SiteController extends Controller
     {
         $gameId = Yii::$app->session['gameId'];
         $playerId = Yii::$app->session['playerId'];
+
         $gameModel = $this->findGameModel($gameId);
         if ($gameModel == null) {
             // game no longer exists
             Yii::$app->session->setFlash('error', 'Game no longer exists!');
-            return $this->redirect(['index', ['gameId'=>$gameId]]);
+            return $this->redirect(['index']);
         }
         $playerModel = $this->findplayerModel($playerId);
         if ($playerModel == null) {
             // game no longer exists
             Yii::$app->session->setFlash('error', 'Game no longer exists!');
-            $this->redirect(['index', ['playerId'=>$playerId]]);
+            $this->redirect(['index']);
         }
 
         $fascists = $playerModel->getFascists($gameModel);
@@ -215,6 +236,15 @@ class SiteController extends Controller
             'fascists' => $fascists,
             'hitler' => $hitler,
         ]);
+    }
+
+    /**
+     * New Game action
+     */
+    public function actionQuit()
+    {
+        $this->clearSession();
+        return $this->redirect(['index']);
     }
 
     /**
@@ -273,5 +303,28 @@ class SiteController extends Controller
     protected function findPlayerModel($id)
     {
         return $model = HitlerPlayer::findOne($id);
+    }
+
+    private function clearSession()
+    {
+        Yii::$app->session['gameCreator'] = '';
+        Yii::$app->session['gameId'] = '';
+        Yii::$app->session['playerId'] = '';
+        Yii::$app->session['gameStarted'] = '';
+    }
+
+    /**
+     * If session exists, redirect to either role or wait action
+     */
+    private function checkSession()
+    {
+        if(Yii::$app->session['gameId'] && Yii::$app->session['playerId']) {
+            return $this->redirect([
+                Yii::$app->session['gameStarted'] ? 'role' : 'wait', 
+                'gameId'=>Yii::$app->session['gameId'],
+                'playerId'=>Yii::$app->session['playerId']
+                ]
+            );
+        }
     }
 }
