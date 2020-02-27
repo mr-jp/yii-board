@@ -53,7 +53,7 @@ class Player extends \yii\db\ActiveRecord
 
     public function checkDuplicateName($attribute, $params)
     {
-        $count = Player::find()->where(['name'=>$this->name])->count();
+        $count = Player::find()->where(['name'=>$this->name, 'fk_game_id'=>$this->fk_game_id])->count();
         if ($count > 0) {
             $this->addError('name', "{$this->name} is already in the game!");
         }

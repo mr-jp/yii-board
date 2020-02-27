@@ -9,10 +9,10 @@ namespace app\commands;
 
 use yii\console\Controller;
 use yii\console\ExitCode;
-use app\modules\hitler\models\HitlerGame;
-use app\modules\hitler\models\HitlerPlayer;
+use app\modules\avalon\models\Game;
+use app\modules\avalon\models\Player;
 
-class HitlerController extends Controller
+class AvalonController extends Controller
 {
     /**
      * This command welcomes you.
@@ -40,14 +40,14 @@ class HitlerController extends Controller
         }
 
         // Create new game
-        $model = new HitlerGame();
+        $model = new Game();
         $model->players = $players;
         $model->timestamp = (string)time();
         $model->started = "0";
         
         if ($model->save()) {
             // Create player to join this game
-            $model2 = new HitlerPlayer();
+            $model2 = new Player();
             $model2->name = 'Jason';
             $model2->fk_game_id = $model->id;
             if($model2->save() == false) {
@@ -56,7 +56,7 @@ class HitlerController extends Controller
                 return ExitCode::SOFTWARE;
             } else {
                 // Set older open games to closed
-                HitlerGame::updateAll(['started'=>'1'], "id != {$model->id}");
+                Game::updateAll(['started'=>'1'], "id != {$model->id}");
             }
 
             echo "Game {$model->id} started with {$players} players\n";
@@ -78,7 +78,7 @@ class HitlerController extends Controller
     public function actionAdd($name = 'Bob')
     {
         // Check if any available game at the moment
-        $gameModel = HitlerGame::find()->where(['started' => '0'])->orderBy('id DESC')->one();
+        $gameModel = Game::find()->where(['started' => '0'])->orderBy('id DESC')->one();
         if ($gameModel === null) {
             echo "Game full or no available game at the moment!\n";
             return ExitCode::SOFTWARE;
@@ -92,7 +92,7 @@ class HitlerController extends Controller
         }
 
         // Create a player and join this game
-        $playerModel = new HitlerPlayer();
+        $playerModel = new Player();
         $playerModel->setScenario('create');
         $playerModel->name = $name;
         $playerModel->fk_game_id = $gameModel->id;
@@ -117,7 +117,7 @@ class HitlerController extends Controller
     public function actionStart()
     {
         // Check if any available game at the moment
-        $gameModel = HitlerGame::find()->where(['started' => '0'])->orderBy('id DESC')->one();
+        $gameModel = Game::find()->where(['started' => '0'])->orderBy('id DESC')->one();
         if ($gameModel === null) {
             echo "Game full or no available game at the moment!\n";
             return ExitCode::SOFTWARE;
@@ -151,8 +151,8 @@ class HitlerController extends Controller
      */
     public function actionDelete($gameId = 0)
     {
-        HitlerGame::deleteAll('id = :gameId', ['gameId'=>$gameId]);
-        HitlerPlayer::deleteAll('fk_game_id = :gameId', ['gameId'=>$gameId]);
+        Game::deleteAll('id = :gameId', ['gameId'=>$gameId]);
+        Player::deleteAll('fk_game_id = :gameId', ['gameId'=>$gameId]);
 
         echo "Game {$gameId} and all it's players deleted\n";
 
@@ -165,7 +165,7 @@ class HitlerController extends Controller
      */
     private function displayPlayerRoles($gameId)
     {
-        $players = HitlerPlayer::find()->where(['fk_game_id'=>$gameId])->all();
+        $players = Game::find()->where(['fk_game_id'=>$gameId])->all();
         foreach($players as $player) {
             echo "{$player->role} \t\t\t\t {$player->name}";
             echo "\n";
